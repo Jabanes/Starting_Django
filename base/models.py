@@ -7,6 +7,5 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=5, decimal_places=2)
     image = models.ImageField(null=True,blank=True,default='/placeholder.png')
 
-
     def __str__(self):
         return self.desc if self.desc else "Unnamed Product"
