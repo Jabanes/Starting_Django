@@ -177,7 +177,7 @@ h1 {
                 cartItemElement.innerHTML = `
                     <h2>${cartItem.desc}</h2>
                     <p>Price: $${cartItem.price}</p>
-                    <img src="${cartItem.image ? 
+                    ${cartItem.image ? 
                             `<img src="${MY_SERVER}/static${cartItem.image}" alt="${cartItem.desc}" />` :
                             `<img src="${MY_SERVER}/media/placeholder.png" alt="Placeholder" />`}
                          `;
