@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username" />
+        <input type="password" id="password" placeholder="Password" />
+        <button onclick="login()">Login</button>
+        <p id="error-message" class="error"></p>
+        <p>Don't have an account? <a href="register.html">Register here</a></p>  <!-- Register link -->
+    </div>
+
+    <script>
+        const MY_SERVER = "http://127.0.0.1:8000";  // Adjust to your backend URL
+    
+        const login = async () => {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    // Prepare the formData to be sent to the backend
+    const formData = {
+        username: username,
+        password: password
+    };
+
+    try {
+        const response = await axios.post(MY_SERVER + "/login", formData); // Use correct endpoint
+
+        // If successful, store tokens
+        localStorage.setItem('access_token', response.data.access);
+        localStorage.setItem('refresh_token', response.data.refresh);
+        console.log("Login successful:", response.data);
+        window.location.href = 'index.html';
+        alert("Login successful!");
+        
+        // Redirect to inside page after successful login
+    } catch (error) {
+        // Handle errors properly
+        console.error('Error logging in:', error);
+        alert('Login failed. Please check your credentials.');
+
+        // Handle error responses more specifically
+        if (error.response) {
+            // Server responded with a status outside 2xx
+            console.error("Error response:", error.response.data);
+            alert(error.response.data.detail || "Login failed. Please try again.");
+        } else if (error.request) {
+            // No response received
+            console.error("Error request:", error.request);
+            alert("No response from server. Check your connection.");
+        } else {
+            // Other errors
+            console.error("Error message:", error.message);
+            alert("An error occurred. Please try again.");
+        }
+    }
+};
+ </script>
+    
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="register-container">
+        <h2>Create an Account</h2>
+        <form id="register-form">
+            <input type="text" id="username" placeholder="Username" required />
+            <input type="email" id="email" placeholder="Email" required />
+            <input type="password" id="password" placeholder="Password" required />
+            <input type="password" id="confirm-password" placeholder="Confirm Password" required />
+            <button type="submit">Register</button>
+        </form>
+        <p id="error-message" class="error"></p>
+        <p>Already have an account? <a href="login.html">Login here</a></p> <!-- Link to login -->
+    </div>
+
+    <script>
+        const MY_SERVER = "http://127.0.0.1:8000";  // Adjust to your backend URL
+
+        // Handle form submission
+        const registerForm = document.getElementById("register-form");
+
+        registerForm.addEventListener("submit", (e) => {
+            e.preventDefault();  // Prevent default form submission
+
+            const username = document.getElementById("username").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirm-password").value;
+
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                document.getElementById("error-message").innerText = "Passwords do not match.";
+                return;
+            }
+
+            // Send data to backend
+            const formData = { username, email, password };
+            
+            axios.post(MY_SERVER + "/register", formData)  // Adjust the endpoint to your backend
+                .then(response => {
+                    alert("Registration successful! Please log in.");
+                    window.location.href = "login.html";  // Redirect to login after successful registration
+                })
+                .catch(error => {
+                    document.getElementById("error-message").innerText = "Error during registration. Please try again.";
+                });
+        });
+    </script>
+</body>
+</html>
