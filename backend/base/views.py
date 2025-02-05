@@ -2,10 +2,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .models import Product
+from .models import Product, Cart
 from .serializer import ProductSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .serializer import RegisterSerializer
+from .serializer import RegisterSerializer, CartSerializer
 from rest_framework import status
 from .permissions import IsSuperUser  # Import the custom permission
 
@@ -66,9 +66,34 @@ def product_detail(req, id):
     product.delete()
     return Response({'message': 'Deleted'}, status=status.HTTP_204_NO_CONTENT)
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
-def cart(req):
-    user = req.user
-    temp_prod = user.product_set.all()
-    return Response(ProductSerializer(temp_prod, many=True).data)
+def cart(request):
+    user = request.user
+
+    if request.method == 'GET':
+        # Retrieve all cart items for the logged-in user
+        cart_items = Cart.objects.filter(user=user)
+        serialized_cart = CartSerializer(cart_items, many=True).data  # Serialize the cart items
+        return Response(serialized_cart)
+
+    elif request.method == 'POST':
+        product_id = request.data.get("product_id")
+        quantity = request.data.get("quantity", 1)  # Default quantity is 1
+
+        if not product_id:
+            return Response({"error": "Product ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check if the product is already in the cart
+        cart_item, created = Cart.objects.get_or_create(user=user, product=product)
+
+        if not created:
+            cart_item.quantity += int(quantity)  # Increment quantity if already exists
+            cart_item.save()
+
+        return Response(CartSerializer(cart_item).data, status=status.HTTP_201_CREATED)

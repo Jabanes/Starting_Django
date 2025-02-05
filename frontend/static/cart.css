@@ -1,0 +1,113 @@
+   /* style.css */
+
+/* General body styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Header styling */
+h1 {
+    text-align: center;
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+/* Product list container */
+#product-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+/* Cart section container */
+#cart-section {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 2px solid #ddd;
+}
+
+/* Individual product card styling */
+.product, .cart-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 200px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Product image styling */
+.product img, .cart-item img {
+    width: 100%;
+    height: auto;
+    max-height: 150px;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+/* Product title and price styling */
+.product h2, .cart-item h2 {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 10px 0;
+}
+
+.product p, .cart-item p {
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Placeholder image styling */
+.product img[alt="Placeholder"], .cart-item img[alt="Placeholder"] {
+    opacity: 0.6;
+    background-color: #f2f2f2;
+}
+
+/* Error or no products available message */
+#product-list p, #cart-section p {
+    color: #e74c3c;
+    font-size: 1rem;
+    text-align: center;
+}
+
+/* Add a little space between product cards on smaller screens */
+@media (max-width: 600px) {
+    .product, .cart-item {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    padding: 15px;
+}
+
+.logo {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+}
+
+.nav-links li {
+    margin: 0 15px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: white;
+    font-size: 1rem;
+}

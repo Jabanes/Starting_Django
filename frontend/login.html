@@ -5,9 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
     <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
+    <nav>
+        <div class="logo">Supermarket</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+        </ul>
+    </nav>
+
     <div class="login-container">
         <h2>Login</h2>
         <input type="text" id="username" placeholder="Username" />
@@ -20,7 +29,7 @@
     <script>
         const MY_SERVER = "http://127.0.0.1:8000";  // Adjust to your backend URL
     
-        const login = async () => {
+    const login = async () => {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
@@ -37,7 +46,7 @@
         localStorage.setItem('access_token', response.data.access);
         localStorage.setItem('refresh_token', response.data.refresh);
         console.log("Login successful:", response.data);
-        window.location.href = 'index.html';
+        window.location.href = 'cart.html';
         alert("Login successful!");
         
     } catch (error) {

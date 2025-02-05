@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="static/cart.css"> <!-- Link to external CSS -->
+
+</head>
+
+<body>
+    <nav>
+        <div class="logo">Supermarket</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+        </ul>
+    </nav>
+    <h1>All Products</h1>
+    
+    <div id="product-list">
+        <!-- Products will be displayed here -->
+    </div>
+
+    <div id="cart-section">
+        <h2>Your Cart</h2>
+        <div id="cart-items">
+            <!-- Cart items will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        const MY_SERVER = "http://127.0.0.1:8000";  // Adjust to your backend URL
+
+        // Function to load products from the API
+        const loadProducts = async () => {
+            try {
+                const response = await axios.get(MY_SERVER + "/products");
+
+                // Grab the product list container
+                const productList = document.getElementById("product-list");
+
+                // Check if products exist and display them
+                if (response.data.length > 0) {
+                    response.data.forEach(product => {
+                        const productElement = document.createElement('div');
+                        productElement.classList.add('product');
+                        
+                        // Display product info
+                        productElement.innerHTML = `
+                        <h2>${product.desc}</h2>
+                        <p>Price: $${product.price}</p>
+                        <!-- Display the image if it exists -->
+                        ${product.image ? 
+                            `<img src="${MY_SERVER}/static${product.image}" alt="${product.desc}" />` :
+                            `<img src="${MY_SERVER}/media/placeholder.png" alt="Placeholder" />`}
+                            <button onclick="buy(${product.id})">Buy</button>
+                         `;
+                        
+                        // Append to the product list container
+                        productList.appendChild(productElement);
+                    });
+                } else {
+                    productList.innerHTML = "<p>No products available.</p>";
+                }
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                document.getElementById("product-list").innerHTML = "<p>Error loading products. Please try again later.</p>";
+            }
+        };
+
+    const loadCart = async () => {
+    const token = localStorage.getItem("access_token"); // Get token
+
+    if (!token) {
+        console.error("No access token found. Please log in first.");
+        document.getElementById("cart-items").innerHTML = "<p>Please log in to see your cart.</p>";
+        return;
+    }
+
+    try {
+        const response = await axios.get("http://127.0.0.1:8000/cart", {
+            headers: { Authorization: `Bearer ${token}` } // Send token
+        });
+
+        console.log(`Cart Response:`, response.data);
+
+        // Grab the cart section container
+        const cartItemsContainer = document.getElementById("cart-items");
+        cartItemsContainer.innerHTML = ""; // Clear previous items
+
+        // Check if cart items exist and display them
+        if (response.data.length > 0) {
+            response.data.forEach(cartItem => {
+                const cartItemElement = document.createElement("div");
+                cartItemElement.classList.add("cart-item");
+
+                // Display cart item info
+                cartItemElement.innerHTML = `
+                            <img src="${MY_SERVER}/static${cartItem.product.image}" alt="${cartItem.desc}" />
+                            <h3>${cartItem.product.desc}</h3>
+                            <p>Price: $${cartItem.product.price}</p>
+                            <button onclick="Remove(${cartItem.id})">Remove</button>
+                        `;
+
+                // Append to the cart items container
+                cartItemsContainer.appendChild(cartItemElement);
+            });
+        } else {
+            cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
+        }
+    } catch (error) {
+        console.error("Error fetching cart items:", error);
+        document.getElementById("cart-items").innerHTML = "<p>Error loading cart. Please try again later.</p>";
+    }
+};
+const buy = async (productId) => {
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+        alert("You must log in to buy a product.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+        const response = await axios.post(
+            `${MY_SERVER}/cart`, 
+            { product_id: productId },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        alert("Product added to cart successfully!");
+    } catch (error) {
+        console.error("Error adding to cart:", error);
+        alert(`Failed to add product ${productId} to cart. Please try again.`);
+    }
+}
+        // Load products and cart on page load
+        window.onload = () => {
+            loadProducts();
+            loadCart();
+        };
+    </script>
+</body>
+</html>
