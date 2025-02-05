@@ -100,9 +100,9 @@
                 // Display cart item info
                 cartItemElement.innerHTML = `
                             <img src="${MY_SERVER}/static${cartItem.product.image}" alt="${cartItem.desc}" />
-                            <h3>${cartItem.product.desc}</h3>
+                            <h3>${cartItem.product.desc}</h3> <p> X ${cartItem.quantity} </p>
                             <p>Price: $${cartItem.product.price}</p>
-                            <button onclick="Remove(${cartItem.id})">Remove</button>
+                            <button onclick="remove(${cartItem.id})">Remove</button>
                         `;
 
                 // Append to the cart items container
@@ -132,7 +132,6 @@ const buy = async (productId) => {
             { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        alert("Product added to cart successfully!");
     } catch (error) {
         console.error("Error adding to cart:", error);
         alert(`Failed to add product ${productId} to cart. Please try again.`);
@@ -143,6 +142,33 @@ const buy = async (productId) => {
             loadProducts();
             loadCart();
         };
+    
+    const remove = async (cartItemId) => {
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+        alert("You must log in to remove an item from the cart.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    // Confirm removal
+    const isConfirmed = window.confirm("Are you sure you want to remove this item from your cart?");
+    if (!isConfirmed) return; // If the user cancels, do nothing
+
+    try {
+        const response = await axios.delete(
+            `${MY_SERVER}/cart/remove/${cartItemId}`, 
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        alert("Product removed from cart successfully!");
+        loadCart(); // Reload the cart after removal
+    } catch (error) {
+        console.error("Error removing product from cart:", error);
+        alert("Failed to remove product from cart. Please try again.");
+    }
+};
     </script>
 </body>
 </html>

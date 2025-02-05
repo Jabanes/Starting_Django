@@ -97,3 +97,14 @@ def cart(request):
             cart_item.save()
 
         return Response(CartSerializer(cart_item).data, status=status.HTTP_201_CREATED)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_from_cart(request, cart_item_id):
+    try:
+        # Find the cart item
+        cart_item = get_object_or_404(Cart, id=cart_item_id)
+        cart_item.delete()
+        return Response({"message": "Product removed from cart."}, status=200)
+    except Cart.DoesNotExist:
+        return Response({"error": "Cart item not found."}, status=404)

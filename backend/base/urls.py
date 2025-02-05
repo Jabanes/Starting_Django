@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
-from .views import register
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 urlpatterns = [
@@ -13,5 +12,6 @@ urlpatterns = [
     path('test', views.test),
     path('staff', views.staff_only),
     path('superusers', views.superuser_only),
-    path('register', register, name='register'),
+    path('register', views.register, name='register'),
+    path('cart/remove/<int:cart_item_id>', views.remove_from_cart)
 ]
