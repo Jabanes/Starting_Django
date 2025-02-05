@@ -65,3 +65,10 @@ def product_detail(req, id):
 
     product.delete()
     return Response({'message': 'Deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def cart(req):
+    user = req.user
+    temp_prod = user.product_set.all()
+    return Response(ProductSerializer(temp_prod, many=True).data)
