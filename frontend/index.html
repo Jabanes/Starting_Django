@@ -1,11 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
 </head>
+<style>
+    /* style.css */
+
+/* General body styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Header styling */
+h1 {
+    text-align: center;
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+/* Product list container */
+#product-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+/* Cart section container */
+#cart-section {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 2px solid #ddd;
+}
+
+/* Individual product card styling */
+.product, .cart-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 200px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Product image styling */
+.product img, .cart-item img {
+    width: 100%;
+    height: auto;
+    max-height: 150px;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+/* Product title and price styling */
+.product h2, .cart-item h2 {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 10px 0;
+}
+
+.product p, .cart-item p {
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Placeholder image styling */
+.product img[alt="Placeholder"], .cart-item img[alt="Placeholder"] {
+    opacity: 0.6;
+    background-color: #f2f2f2;
+}
+
+/* Error or no products available message */
+#product-list p, #cart-section p {
+    color: #e74c3c;
+    font-size: 1rem;
+    text-align: center;
+}
+
+/* Add a little space between product cards on smaller screens */
+@media (max-width: 600px) {
+    .product, .cart-item {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+</style>
 <body>
-    Hello
+    <h1>All Products</h1>
+    
+    <div id="product-list">
+        <!-- Products will be displayed here -->
+    </div>
+
+    <div id="cart-section">
+        <h2>Your Cart</h2>
+        <div id="cart-items">
+            <!-- Cart items will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        const MY_SERVER = "http://127.0.0.1:8000";  // Adjust to your backend URL
+
+        // Function to load products from the API
+        const loadProducts = async () => {
+            try {
+                const response = await axios.get(MY_SERVER + "/products");
+
+                // Grab the product list container
+                const productList = document.getElementById("product-list");
+
+                // Check if products exist and display them
+                if (response.data.length > 0) {
+                    response.data.forEach(product => {
+                        const productElement = document.createElement('div');
+                        productElement.classList.add('product');
+                        
+                        // Display product info
+                        productElement.innerHTML = `
+                        <h2>${product.desc}</h2>
+                        <p>Price: $${product.price}</p>
+                        <!-- Display the image if it exists -->
+                        ${product.image ? 
+                            `<img src="${MY_SERVER}/static${product.image}" alt="${product.desc}" />` :
+                            `<img src="${MY_SERVER}/media/placeholder.png" alt="Placeholder" />`}
+                         `;
+                        
+                        // Append to the product list container
+                        productList.appendChild(productElement);
+                    });
+                } else {
+                    productList.innerHTML = "<p>No products available.</p>";
+                }
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                document.getElementById("product-list").innerHTML = "<p>Error loading products. Please try again later.</p>";
+            }
+        };
+
+    const loadCart = async () => {
+    const token = localStorage.getItem("access_token"); // Get token
+
+    if (!token) {
+        console.error("No access token found. Please log in first.");
+        document.getElementById("cart-items").innerHTML = "<p>Please log in to see your cart.</p>";
+        return;
+    }
+
+    try {
+        const response = await axios.get("http://127.0.0.1:8000/cart", {
+            headers: { Authorization: `Bearer ${token}` } // Send token
+        });
+
+        console.log(`Cart Response:`, response.data);
+
+        // Grab the cart section container
+        const cartItemsContainer = document.getElementById("cart-items");
+        cartItemsContainer.innerHTML = ""; // Clear previous items
+
+        // Check if cart items exist and display them
+        if (response.data.length > 0) {
+            response.data.forEach(cartItem => {
+                const cartItemElement = document.createElement("div");
+                cartItemElement.classList.add("cart-item");
+
+                // Display cart item info
+                cartItemElement.innerHTML = `
+                    <h2>${cartItem.desc}</h2>
+                    <p>Price: $${cartItem.price}</p>
+                    <img src="${cartItem.image ? 
+                            `<img src="${MY_SERVER}/static${cartItem.image}" alt="${cartItem.desc}" />` :
+                            `<img src="${MY_SERVER}/media/placeholder.png" alt="Placeholder" />`}
+                         `;
+
+                // Append to the cart items container
+                cartItemsContainer.appendChild(cartItemElement);
+            });
+        } else {
+            cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
+        }
+    } catch (error) {
+        console.error("Error fetching cart items:", error);
+        document.getElementById("cart-items").innerHTML = "<p>Error loading cart. Please try again later.</p>";
+    }
+};
+
+        // Load products and cart on page load
+        window.onload = () => {
+            loadProducts();
+            loadCart();
+        };
+    </script>
 </body>
 </html>
