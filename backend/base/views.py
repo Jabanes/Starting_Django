@@ -106,4 +106,8 @@ def checkout(request):
         product.stock -= quantity  # Decrease stock based on the quantity purchased
         product.save()
 
-    return Response({"detail": "Checkout successful!"}, status=status.HTTP_201_CREATED)
+        return Response({
+            "detail": "Checkout successful!",
+            "purchase_id": purchase.id  # Ensure purchase.id is included
+        }, status=status.HTTP_201_CREATED)
+

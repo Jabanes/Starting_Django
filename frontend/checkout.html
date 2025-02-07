@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .cart-items {
+            margin-top: 20px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .cart-item span {
+            font-size: 1rem;
+            color: #333;
+        }
+        .total {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 20px;
+        }
+        .checkout-button {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        .checkout-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Review Your Cart</h1>
+
+        <div id="cart-items" class="cart-items">
+            <!-- Cart items will be dynamically populated here -->
+        </div>
+
+        <div class="total" id="total-price">
+            <!-- Total price will be dynamically populated here -->
+        </div>
+
+        <button class="checkout-button" onclick="checkout()">Checkout</button>
+    </div>
+
+    <script>
+        const MY_SERVER = "http://127.0.0.1:8000";
+        // Get cart from localStorage
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        // Display the cart items dynamically
+        const cartItemsContainer = document.getElementById("cart-items");
+        const totalPriceElement = document.getElementById("total-price");
+
+        let totalPrice = 0;
+
+        cart.forEach(item => {
+            const cartItemDiv = document.createElement("div");
+            cartItemDiv.classList.add("cart-item");
+
+            const itemDescription = document.createElement("span");
+            itemDescription.textContent = `${item.desc} - Quantity: ${item.quantity}`;
+
+            const itemTotalPrice = document.createElement("span");
+            const itemTotal = item.price * item.quantity;
+            totalPrice += itemTotal;
+            itemTotalPrice.textContent = `$${itemTotal.toFixed(2)}`;
+
+            cartItemDiv.appendChild(itemDescription);
+            cartItemDiv.appendChild(itemTotalPrice);
+
+            cartItemsContainer.appendChild(cartItemDiv);
+        });
+
+        // Display total price
+        totalPriceElement.textContent = `Total: $${totalPrice.toFixed(2)}`;
+
+        // Function to confirm checkout
+        function confirmCheckout() {
+            const confirmation = confirm("Are you sure you want to proceed with the checkout?");
+            if (confirmation) {
+                alert("Proceeding with checkout...");
+                checkout()
+                
+                // Redirect to a success page or make an API call
+            } else {
+                alert("Checkout canceled.");
+            }
+        }
+
+    const checkout = async () => {
+    const cart = JSON.parse(localStorage.getItem("cart"));  // Assume the cart is stored in localStorage
+
+    if (cart.length === 0) {
+        alert("Your cart is empty.");
+        return;
+    }
+
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+        alert("You need to log in first.");
+        return;
+    }
+
+    if (confirm("are you sure you want to proceed with the checkout?")){
+        try {
+        const response = await axios.post(
+            `${MY_SERVER}/checkout`,
+            { cart },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+        window.location.href = 'cart.html';
+        console.log(response.data);
+        alert("Checkout successful! Your purchase ID: " + response.data.purchase_id);
+        localStorage.removeItem("cart");  // Clear the cart after successful checkout
+        
+        
+    } catch (error) {
+        console.error("Error during checkout:", error);
+        alert("An error occurred during checkout. Please try again.");
+    }
+    }
+    else{
+        alert("Checkout canceled!")
+        window.location.href = 'cart.html';
+    }
+    
+    
+};
+    </script>
+
+</body>
+</html>

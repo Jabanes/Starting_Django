@@ -19,7 +19,7 @@
         </ul>
     </nav>
 
-    <h1>All Products</h1> <button id="checkout-button" onclick="checkout()">Proceed to Checkout</button>
+    <h1>All Products</h1> <button id="checkout-button" onclick="proceed()">Proceed to Checkout</button>
     <div id="cart-total">
         <h3>Total: $<span id="total-price">0.00</span></h3>
     </div>
@@ -196,34 +196,17 @@
         document.getElementById("total-price").innerText = total.toFixed(2);
         };
          
-    const checkout = async () => {
-    const cart = JSON.parse(localStorage.getItem("cart"));  // Assume the cart is stored in localStorage
-
-    if (cart.length === 0) {
+        
+    const proceed = () => {
+        const cart = JSON.parse(localStorage.getItem("cart"));  // Assume the cart is stored in localStorage
+        
+        if (cart.length === 0) {
         alert("Your cart is empty.");
         return;
     }
+        window.location.href = 'checkout.html';
 
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-        alert("You need to log in first.");
-        return;
     }
-
-    try {
-        const response = await axios.post(
-            `${MY_SERVER}/checkout`,
-            { cart },
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
-        alert("Checkout successful! Your purchase ID: " + response.data.purchase_id);
-        localStorage.removeItem("cart");  // Clear the cart after successful checkout
-        
-    } catch (error) {
-        console.error("Error during checkout:", error);
-        alert("An error occurred during checkout. Please try again.");
-    }
-};
 
     </script>
 </body>
