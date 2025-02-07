@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Cart
+from .models import Product, Purchase, PurchaseItem
 from django.contrib.auth.models import User
 
 
@@ -19,9 +19,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         return user
 
-class CartSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()  # Serialize the product details inside cart
+
+class PurchaseItemSerializer(serializers.ModelSerializer):
+    product_desc = serializers.CharField(source='product.desc')
+    product_price = serializers.DecimalField(source='product.price', max_digits=10, decimal_places=2)
 
     class Meta:
-        model = Cart
-        fields = ['id', 'product', 'quantity']
+        model = PurchaseItem
+        fields = '__all__'
+
+class PurchaseSerializer(serializers.ModelSerializer):
+    items = PurchaseItemSerializer(source='items', many=True)
+
+    class Meta:
+        model = Purchase
+        fields = '__all__'

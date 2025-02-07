@@ -2,13 +2,14 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .models import Product, Cart
-from .serializer import ProductSerializer
+from .models import Purchase, Product, PurchaseItem
+from .serializer import ProductSerializer, PurchaseSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .serializer import RegisterSerializer, CartSerializer
+from .serializer import RegisterSerializer
 from rest_framework import status
 from .permissions import IsSuperUser  # Import the custom permission
-
+from decimal import Decimal
+from django.contrib.auth.decorators import login_required
 
 @api_view(['GET'])
 @permission_classes([IsSuperUser])  
@@ -36,7 +37,7 @@ def test(req):
 
 @api_view(['GET'])
 def index(req):
-    return Response('Welcom To home page')
+    return Response('Welcome To home page')
 
 @api_view(['GET', 'POST'])
 def myProducts(req):
@@ -66,45 +67,43 @@ def product_detail(req, id):
     product.delete()
     return Response({'message': 'Deleted'}, status=status.HTTP_204_NO_CONTENT)
 
-@api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
-def cart(request):
+
+# API view to handle checkout
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])  # Ensure only authenticated users can checkout
+def checkout(request):
     user = request.user
+    cart = request.data.get('cart', [])
 
-    if request.method == 'GET':
-        # Retrieve all cart items for the logged-in user
-        cart_items = Cart.objects.filter(user=user)
-        serialized_cart = CartSerializer(cart_items, many=True).data  # Serialize the cart items
-        return Response(serialized_cart)
+    if not cart:
+        return Response({"detail": "Your cart is empty."}, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'POST':
-        product_id = request.data.get("product_id")
-        quantity = request.data.get("quantity", 1)  # Default quantity is 1
+    # Calculate the total price of the purchase
+    total_price = sum(
+        float(item['price']) * int(item['quantity'])  # Explicitly convert to float and int
+        for item in cart
+    )
 
-        if not product_id:
-            return Response({"error": "Product ID is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            product = Product.objects.get(id=product_id)
-        except Product.DoesNotExist:
-            return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+    # Create the Purchase record
+    purchase = Purchase.objects.create(user=user, total_amount=total_price)
 
-        # Check if the product is already in the cart
-        cart_item, created = Cart.objects.get_or_create(user=user, product=product)
+    # Loop through the cart items and create PurchaseItem records
+    for item in cart:
+        product = get_object_or_404(Product, id=item['id'])  # Get the product from the database
+        quantity = item['quantity']
+        price = item['price']
 
-        if not created:
-            cart_item.quantity += int(quantity)  # Increment quantity if already exists
-            cart_item.save()
+        # Create the purchase item for each product in the cart
+        PurchaseItem.objects.create(
+            purchase=purchase,
+            product=product,
+            quantity=quantity,
+            price=price
+        )
 
-        return Response(CartSerializer(cart_item).data, status=status.HTTP_201_CREATED)
+        # Optionally, you can update the product stock here if needed
+        product.stock -= quantity  # Decrease stock based on the quantity purchased
+        product.save()
 
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def remove_from_cart(request, cart_item_id):
-    try:
-        # Find the cart item
-        cart_item = get_object_or_404(Cart, id=cart_item_id)
-        cart_item.delete()
-        return Response({"message": "Product removed from cart."}, status=200)
-    except Cart.DoesNotExist:
-        return Response({"error": "Cart item not found."}, status=404)
+    return Response({"detail": "Checkout successful!"}, status=status.HTTP_201_CREATED)

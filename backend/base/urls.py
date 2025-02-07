@@ -8,10 +8,10 @@ urlpatterns = [
     path('products', views.myProducts),
     path('products/<int:id>', views.product_detail),
     path('login', TokenObtainPairView.as_view()),    
-    path('cart', views.cart),
     path('test', views.test),
     path('staff', views.staff_only),
     path('superusers', views.superuser_only),
     path('register', views.register, name='register'),
-    path('cart/remove/<int:cart_item_id>', views.remove_from_cart)
+    path('checkout', views.checkout)
+    
 ]

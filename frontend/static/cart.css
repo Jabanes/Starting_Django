@@ -14,23 +14,27 @@ h1 {
     margin-bottom: 30px;
 }
 
-/* Product list container */
+/* Main layout container */
+.main-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* Product list styling */
 #product-list {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: flex-start;
     gap: 20px;
-}
-
-/* Cart section container */
-#cart-section {
-    margin-top: 50px;
-    padding-top: 20px;
-    border-top: 2px solid #ddd;
+    flex: 2;
 }
 
 /* Individual product card styling */
-.product, .cart-item {
+.product {
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -41,7 +45,7 @@ h1 {
 }
 
 /* Product image styling */
-.product img, .cart-item img {
+.product img {
     width: 100%;
     height: auto;
     max-height: 150px;
@@ -50,51 +54,90 @@ h1 {
 }
 
 /* Product title and price styling */
-.product h2, .cart-item h2 {
+.product h2 {
     font-size: 1.2rem;
     color: #333;
     margin: 10px 0;
 }
 
-.product p, .cart-item p {
+.product p {
     font-size: 1rem;
     color: #555;
 }
 
-/* Placeholder image styling */
-.product img[alt="Placeholder"], .cart-item img[alt="Placeholder"] {
-    opacity: 0.6;
-    background-color: #f2f2f2;
+/* Cart section */
+#cart-section {
+    background-color: rgb(224, 192, 192);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    width: 1600px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    flex: 1;
 }
 
-/* Error or no products available message */
-#product-list p, #cart-section p {
-    color: #e74c3c;
-    font-size: 1rem;
-    text-align: center;
+/* Total price display */
+#cart-total {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
-/* Cart items will be displayed in a row */
+/* Cart items container */
 #cart-items {
     display: flex;
-    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
-    justify-content: flex-start; /* Align items to the left */
-    gap: 20px; /* Space between items */
+    flex-direction: row;
+    gap: 10px;
 }
 
-/* Individual cart item should not stretch */
+/* Individual cart item */
 .cart-item {
-    flex: 0 0 auto; /* Prevent cart items from stretching */
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Add a little space between product cards on smaller screens */
-@media (max-width: 600px) {
-    .product, .cart-item {
-        width: 100%;
-        max-width: 300px;
-    }
+/* Cart item image */
+.cart-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
 }
 
+/* Quantity input */
+.cart-item input[type="number"] {
+    width: 50px;
+    padding: 5px;
+    text-align: center;
+    font-size: 1rem;
+    margin: 0 5px;
+}
+
+/* Checkout button */
+#checkout-button {
+    width: 15%;
+    padding: 5px;
+    background-color: #2183bb;
+    color: rgb(240, 232, 232);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1rem;
+   
+   
+}
+
+#checkout-button:hover {
+    background-color: #45a049;
+}
+
+/* Navbar */
 nav {
     display: flex;
     justify-content: space-between;
@@ -123,11 +166,20 @@ nav {
     color: white;
     font-size: 1rem;
 }
-/* Thinner input field for quantity */
-.cart-item input[type="number"] {
-    width: 50px; /* Adjust the width to be thinner */
-    padding: 5px; /* Adjust padding for better fit */
-    text-align: center; /* Center the text inside the input */
-    font-size: 1rem; /* Font size for better readability */
-    margin: 0 5px; /* Space on left and right */
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #cart-section {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    #product-list {
+        justify-content: center;
+    }
 }
