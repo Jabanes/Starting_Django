@@ -111,3 +111,16 @@ def checkout(request):
             "purchase_id": purchase.id  # Ensure purchase.id is included
         }, status=status.HTTP_201_CREATED)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def selective(req):
+    user = req.user
+    temp_prod = user.product_set.all()
+    return Response(ProductSerializer(temp_prod, many=True).data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated,  IsAdminUser])  # Only admin users can access
+def admin_selective(request, id):
+    user = get_object_or_404(User, id=id)  # Fetch the user or return 404
+    products = Product.objects.filter(user=user)  # Get products by this user
+    return Response(ProductSerializer(products, many=True).data)  # Serialize & return

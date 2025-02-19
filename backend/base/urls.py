@@ -12,6 +12,8 @@ urlpatterns = [
     path('staff', views.staff_only),
     path('superusers', views.superuser_only),
     path('register', views.register, name='register'),
-    path('checkout', views.checkout)
+    path('checkout', views.checkout),
+    path('products/selective',views.selective),
+    path('products/selective/<int:id>', views.admin_selective),
     
 ]
